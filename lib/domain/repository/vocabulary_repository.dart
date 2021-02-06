@@ -10,6 +10,7 @@ abstract class VocabularyRepository {
   Future<bool> uploadTestSet();
 
   Future<bool> insertWord({
+    int primaryKey,
     @required String word,
     @required List<String> translateList,
     String imagePath,
@@ -19,22 +20,21 @@ abstract class VocabularyRepository {
 
   Future<List<Word>> generateQuizWords();
 
-  Future<List<Word>> generateQuizVariantsOf(Word _word);
+  Future<List<Word>> getNRandomRecordsExceptWord({
+    @required Word word,
+    int itemsNum,
+  });
 
   Future<bool> updateTranslateList({
     @required Word word,
     @required List<String> newTranslateList,
   });
 
-  Future<bool> updatePassingStatus({
+  Future<bool> updateBoolStatuses({
     @required Word word,
-    @required bool newIsPassed,
+    @required bool isPassed,
+    @required bool doesSelectedOnce,
   });
 
-  Future<bool> updateVirginStatus({
-    @required Word word,
-    @required bool newDoesSelectedOnce,
-  });
-
-  Future<void> deleteRecords();
+  Future<void> deleteAllRecords();
 }

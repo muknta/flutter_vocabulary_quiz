@@ -18,19 +18,13 @@ class WordDao {
   Database get _db => locator<Database>();
 
 
-
   Future<bool> insertWord(Word word) async {
     try {
-      // await _wordFolder.add(_db, WordMapper.toJson(word));
-      // print('Word inserted');
-
-      // return true;
-
       Database db = _db;
       await db.transaction((txn) async {
         // Add the object, get the auto incremented id
         final int key = await _wordFolder.add(txn, WordMapper.toJson(word));
-        print('key - $key');
+        print('New word key - $key');
         word.copyWith(primaryKey: key);
         // Set the Id in our object
         await _wordFolder.record(key).update(txn, {'primary_key': key});
@@ -104,7 +98,6 @@ class WordDao {
   Future<Map<String, dynamic>> getAllWords() async {
     List<Word> wordList = [];
     bool result = false;
-
     try {
       final recordSnapshot = await _wordFolder.find(_db);
       
@@ -123,7 +116,7 @@ class WordDao {
     };
   }
 
-  Future<void> deleteRecords() async {
+  Future<void> deleteAllRecords() async {
     await _wordFolder.delete(_db);
   }
 }

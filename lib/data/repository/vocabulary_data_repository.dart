@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:math' show Random;
+import 'dart:convert';
 
 import 'package:meta/meta.dart';
 
@@ -35,74 +37,131 @@ class VocabularyDataRepository extends VocabularyRepository {
 
   @override
   Future<List<Word>> generateQuizWords() async {
-    var response = await wordDao.boolFilterWords();
-    print('response - $response');
-    // List<Word> _quizWords = _chooseQuizWordsFromAllWords(response['data']);
-    // return _quizWords;
-    return [];
-  }
-
-  List<Word> _chooseQuizWordsFromAllWords(List<Word> _allWords) {
-    List<Word> _quizWords = [];
-
-    _quizWords = _chooseWhichWhereNotUsed(
-        allWords: _allWords,
-        quizWords: _quizWords,
-      );
-    if (_quizWords.length == Config.quizWordsNum) {
-      return _quizWords;
-    } else {
-      _quizWords = _chooseWhichWhereNotPassed(
-          allWords: _allWords,
-          quizWords: _quizWords,
-        );
-    }
-    if (_quizWords.length == Config.quizWordsNum) {
-      return _quizWords;
-    } 
-    // else {
-    //   _quizWords = _chooseWhichPassed(
-    //       allWords: _allWords,
-    //       quizWords: _quizWords,
-    //     );
-    // }
+    List<Word> _wordList = await _getQuizWordsByBool(
+      wordsNum: Config.quizWordsNum,
+      isPassed: false,
+      doesSelectedOnce: false,
+    );
     
+    if ((_wordList?.length ?? 0) >= Config.quizWordsNum) {
+      return _wordList;
+    } else {
+      int neededLength = Config.quizWordsNum - _wordList?.length ?? 0;
+      List<Word> _subList = await _getQuizWordsByBool(
+        wordsNum: neededLength,
+        isPassed: false,
+        doesSelectedOnce: true,
+      );
+      _wordList.addAll(_subList);
+    }
+    if ((_wordList?.length ?? 0) >= Config.quizWordsNum) {
+      return _wordList;
+    } else {
+      int neededLength = Config.quizWordsNum - _wordList?.length ?? 0;
+      List<Word> _subList = await _getQuizWordsByBool(
+        wordsNum: neededLength,
+        isPassed: true,
+        doesSelectedOnce: true,
+      );
+      _wordList.addAll(_subList);
+    }
+    if (_wordList?.isEmpty ?? true) {
+      return _wordList;
+    }
+
+    List<Word> _resultList = [];
+    for (int i = 0; _resultList.length < Config.quizWordsNum; i++) {
+      _resultList.add(_wordList.elementAt(i % _wordList.length));
+    }
+    return _resultList;
   }
 
-  List<Word> _chooseWhichWhereNotUsed({
-    List<Word> allWords,
-    List<Word> quizWords,
-  }) {
-    for (Word _word in allWords) {
-      if (quizWords.length == Config.quizWordsNum) {
-        return quizWords;
-      }
-      if (!_word.isPassed && !_word.doesSelectedOnce) {
-        quizWords.add(_word);
-      }
+  Future<List<Word>> _getQuizWordsByBool({
+    @required int wordsNum,
+    @required bool isPassed,
+    @required bool doesSelectedOnce,
+  }) async {
+    List<Word> response = await wordDao.boolFilterWords(
+          isPassed: isPassed,
+          doesSelectedOnce: doesSelectedOnce,
+        );
+    List<Word> _wordList = [];
+    print('response - $response');
+    if (response?.length >= Config.quizWordsNum) {
+      _wordList = response.sublist(0, wordsNum);
+    } else if (response?.length != 0) {
+      _wordList = response.sublist(0);
     }
-    return quizWords;
-  }
-
-  List<Word> _chooseWhichWhereNotPassed({
-    List<Word> allWords,
-    List<Word> quizWords,
-  }) {
-    for (Word _word in allWords) {
-      if (quizWords.length == Config.quizWordsNum) {
-        return quizWords;
-      }
-      if (!_word.isPassed && _word.doesSelectedOnce) {
-        quizWords.add(_word);
-      }
-    }
-    return quizWords;
+    return _wordList;
   }
 
   @override
-  Future<List<Word>> generateQuizVariantsOf(Word _word) async {
+  Future<List<Word>> getNRandomRecordsExceptWord({
+    @required Word word,
+    int itemsNum = Config.quizVariantsNum - 1,
+  }) async {
+    List<Word> _wordList = [];
+    bool result = false;
+    Random random = new Random();
+
     Map<String, dynamic> response = await wordDao.getAllWords();
-    return response['data'];
+    if (response['result'] ?? false) {
+      List<Word> _allWords = response['data'];
+
+      List<int> _randomList = _getRandomList(
+            itemsNum, _allWords.length, random);
+
+      _randomList.forEach((int _randInt) {
+        Word _word = _allWords.elementAt(_randInt);
+        _word.word != word.word
+          ? _wordList.add(_word)
+          : _wordList.add(
+              _allWords.elementAt(
+                _getDifferentRandInt(
+                  _randomList, _allWords.length, random,
+                )
+              )
+            );
+      });
+    }
+    _wordList
+        ..add(word)
+        ..shuffle();
+    return _wordList;
+  }
+
+  List<int> _getRandomList(
+    int itemsNum,
+    int maxValue,
+    Random random,
+  ) {
+    List<int> _randomList = new List.generate(
+        itemsNum,
+        (_) => random.nextInt(maxValue),
+      );
+    print('_randomList - $_randomList');
+    _randomList.toSet().toList();
+    while (_randomList.length < itemsNum) {
+      _randomList.add(
+        _getDifferentRandInt(_randomList, maxValue, random)
+      );
+    }
+    return _randomList;
+  }
+
+  int _getDifferentRandInt(
+    List<int> _randList,
+    int _maxNum,
+    Random _random,
+  ) {
+    if (_maxNum <= (_randList?.length ?? 0)) {
+      return 0;
+    }
+    int _randInt = _random.nextInt(_maxNum);
+    while (_randList.contains(_randInt)) {
+      _randInt = _random.nextInt(_maxNum);
+    }
+    return _randInt;
   }
 
   @override
@@ -141,25 +200,15 @@ class VocabularyDataRepository extends VocabularyRepository {
   }
 
   @override
-  Future<bool> updatePassingStatus({
+  Future<bool> updateBoolStatuses({
     @required Word word,
-    @required bool newIsPassed,
-  }) async {
-    Word newWord = word.copyWith(isPassed: newIsPassed);
-
-    return await wordDao.updateWord(
-      newWord: newWord,
-      oldWord: word,
-    );
-  }
-
-  @override
-  Future<bool> updateVirginStatus({
-    @required Word word,
-    @required bool newDoesSelectedOnce,
+    @required bool isPassed,
+    @required bool doesSelectedOnce,
   }) async {
     Word newWord = word.copyWith(
-      doesSelectedOnce: newDoesSelectedOnce);
+      isPassed: isPassed,
+      doesSelectedOnce: doesSelectedOnce,
+    );
 
     return await wordDao.updateWord(
       newWord: newWord,
@@ -168,7 +217,7 @@ class VocabularyDataRepository extends VocabularyRepository {
   }
 
   @override
-  Future<void> deleteRecords() async {
-    await wordDao.deleteRecords();
+  Future<void> deleteAllRecords() async {
+    await wordDao.deleteAllRecords();
   }
 }

@@ -18,6 +18,7 @@ class Word {
   final bool isPassed;
   final bool doesSelectedOnce;
 
+
   Word copyWith({
     int primaryKey,
     String word,

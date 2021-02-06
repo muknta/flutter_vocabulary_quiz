@@ -23,11 +23,15 @@ class QuizPage extends StatelessWidget {
   VocabularyBloc vocabularyBloc;
   Word _currWord;
   List<Word> _variants = [];
+  bool _fromOriginal = true;
   // int _currWordNum = 1;
 
   @override
   Widget build(BuildContext context) {
     vocabularyBloc = Provider.of<VocabularyBloc>(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await vocabularyBloc.onStartQuiz();
+    });
 
     return StreamBuilder<Word>(
       stream: vocabularyBloc?.quizWordStream,
@@ -69,7 +73,15 @@ class QuizPage extends StatelessWidget {
             message: "There is no variants",
           );
         }
-        return _contentColumn();
+        return StreamBuilder<bool>(
+          stream: vocabularyBloc?.fromOriginalStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              _fromOriginal = snapshot.data;
+            }
+            return _contentColumn();
+          },
+        );
       },
     );
   }
@@ -77,54 +89,65 @@ class QuizPage extends StatelessWidget {
   Widget _contentColumn() {
     return Column(
       children: <Widget>[
-        CenterTextWidget(message: "Quiz Page"),
+        Padding(
+          padding: EdgeInsets.all(35),
+          child: Text(
+            _fromOriginal
+              ? _currWord?.word
+              : _currWord?.translateList.elementAt(0),
+            style: TextStyle(fontSize: 30),
+          ),
+        ),
         _generateVariantList(),
-        vocabularyBloc.currQuizWordNum < Config.quizWordsNum
-          ? _nextButton()
-          : _getResultButton(),
+        // vocabularyBloc.currQuizWordNum < Config.quizWordsNum
+        //   ? _nextButton()
+        //   : _getResultButton(),
       ],
     );
   }
 
   Widget _generateVariantList() {
-    return GridView.builder(
-      itemCount: _variants?.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: Config.variantsInRow,
+    print('Variants: $_variants');
+    return Expanded(
+      child: GridView.builder(
+        itemCount: _variants?.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: Config.variantsInRow,
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            child: VariantGridTile(
+              word: _variants.elementAt(index),
+              fromOriginal: _fromOriginal,
+            ),
+          );
+        },
       ),
-      itemBuilder: (BuildContext context, int index) {
-        return Card(
-          child: VariantGridTile(
-            word: _variants[index],
-            isOriginal: true, // TODO: get from bloc
-          ),
-        );
-      },
     );
   }
 
-  Widget _nextButton() {
-    return ElevatedButton(
-      onPressed: () {
+  // Widget _nextButton() {
+  //   return ElevatedButton(
+  //     onPressed: () {
 
-      },
-      child: Text("Next"),
-    );
-  }
+  //     },
+  //     child: Text("Next"),
+  //   );
+  // }
 
-  Widget _getResultButton() {
-    final double _percentage = vocabularyBloc?.calculateResult();
+  // Widget _getResultButton() {
+  //   final double _percentage = vocabularyBloc?.calculateResult();
 
-    return ElevatedButton(
-      onPressed: () {
-        locator<NavigationService>().navigateTo(
-          Routes.result,
-          arguments: {
-            'percentage': _percentage,
-          },
-        );
-      },
-      child: Text("Get result"),
-    );
-  }
+  //   return ElevatedButton(
+  //     onPressed: () {
+  //       locator<NavigationService>().navigateTo(
+  //         Routes.result,
+  //         arguments: {
+  //           'percentage': _percentage,
+  //         },
+  //       );
+  //     },
+  //     child: Text("Get result"),
+  //   );
+  // }
 }

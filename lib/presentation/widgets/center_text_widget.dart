@@ -11,7 +11,9 @@ class CenterTextWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(_message),
+      child: Text(
+        _message,
+      ),
     );
   }
 }

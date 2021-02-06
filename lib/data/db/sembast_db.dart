@@ -10,6 +10,7 @@ import 'package:vocabulary_quiz/data/config.dart';
 
 class SembastDB {
   Completer<Database> _dbOpenCompleter;
+  String _dbPath;
 
   Future<Database> get database async {
     if (_dbOpenCompleter == null) {
@@ -21,18 +22,20 @@ class SembastDB {
   }
 
   Future<void> _openDatabase() async {
-    final appDocumentDir = await getApplicationDocumentsDirectory();
-    final dbPath = join(appDocumentDir.path, Config.sembastDBName);
-
-    final database = await databaseFactoryIo.openDatabase(dbPath);
+    _dbPath ??= await _getDBPath();
+    final database = await databaseFactoryIo.openDatabase(_dbPath);
 
     _dbOpenCompleter.complete(database);
   }
 
   Future<void> _deleteDatabase() async {
-    final appDocumentDir = await getApplicationDocumentsDirectory();
-    final dbPath = join(appDocumentDir.path, Config.sembastDBName);
+    _dbPath ??= await _getDBPath();
+    await databaseFactoryIo.deleteDatabase(_dbPath);
+  }
 
-    await databaseFactoryIo.deleteDatabase(dbPath);
+  Future<String> _getDBPath() async {
+    final appDocumentDir = await getApplicationDocumentsDirectory();
+    _dbPath = join(appDocumentDir.path, Config.sembastDBName);
+    return _dbPath;
   }
 }

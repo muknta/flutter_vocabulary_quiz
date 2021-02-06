@@ -14,10 +14,19 @@ class WordListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Image.asset(_word.imagePath),
-      title: _buildTitle(),
-      trailing: Icon(Icons.volume_up),
+    return Container(
+      decoration: BoxDecoration (
+        color: _word.isPassed && _word.doesSelectedOnce
+          ? Colors.green
+          : !_word.isPassed && _word.doesSelectedOnce
+            ? Colors.red
+            : Colors.white,
+      ),
+      child: ListTile(
+        leading: Image.asset(_word.imagePath),
+        title: _buildTitle(),
+        trailing: Icon(Icons.volume_up),
+      ),
     );
   }
 
