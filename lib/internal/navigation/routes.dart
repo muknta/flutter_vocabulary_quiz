@@ -31,6 +31,7 @@ class Routes {
         return Routes.getPageRoute(
           routeName: settings.name,
           viewToShow: ResultPage(
+            globalResult: args["global_result"],
             percentage: args["percentage"],
           ),
         );

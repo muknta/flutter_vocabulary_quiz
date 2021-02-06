@@ -25,6 +25,8 @@ abstract class VocabularyRepository {
     int itemsNum,
   });
 
+  Future<bool> checkIfWordUnique(String word);
+
   Future<bool> updateTranslateList({
     @required Word word,
     @required List<String> newTranslateList,

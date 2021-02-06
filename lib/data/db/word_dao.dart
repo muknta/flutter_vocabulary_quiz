@@ -116,6 +116,22 @@ class WordDao {
     };
   }
 
+  Future<bool> checkIfWordUnique(String word) async {
+    List<Word> wordList = [];
+    bool result = false;
+    try {
+      final finder = Finder(filter: Filter.equals("word", word));
+      final recordSnapshot = await _wordFolder.find(_db, finder: finder);
+      
+      if (recordSnapshot?.isEmpty ?? true) {
+        return true;
+      }
+    } on ReadingException {
+      print('ReadingException');
+    }
+    return false;
+  }
+
   Future<void> deleteAllRecords() async {
     await _wordFolder.delete(_db);
   }

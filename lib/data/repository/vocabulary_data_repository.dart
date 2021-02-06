@@ -86,7 +86,7 @@ class VocabularyDataRepository extends VocabularyRepository {
           doesSelectedOnce: doesSelectedOnce,
         );
     List<Word> _wordList = [];
-    print('response - $response');
+    // print('response - $response');
     if (response?.length >= Config.quizWordsNum) {
       _wordList = response.sublist(0, wordsNum);
     } else if (response?.length != 0) {
@@ -183,6 +183,11 @@ class VocabularyDataRepository extends VocabularyRepository {
         doesSelectedOnce: doesSelectedOnce,
       )
     );
+  }
+
+  @override
+  Future<bool> checkIfWordUnique(String word) async {
+    return await wordDao.checkIfWordUnique(word);
   }
 
   @override

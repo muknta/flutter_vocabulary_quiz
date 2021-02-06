@@ -8,34 +8,60 @@ import 'package:vocabulary_quiz/domain/model/word.dart';
 
 class VariantGridTile extends StatelessWidget {
   VariantGridTile({
+    Key key,
     @required Word word,
     @required this.fromOriginal,
-  })  : this._word = word,
-        assert(word != null);
+  })  : assert(word != null),
+        this._word = word,
+        super(key: key);
 
   final Word _word;
   final bool fromOriginal;
+  bool _variantResult;
+  bool _tapped = false;
   VocabularyBloc vocabularyBloc;
 
   @override
   Widget build(BuildContext context) {
     vocabularyBloc = Provider.of<VocabularyBloc>(context);
-    return GridTile(
-      footer: Center(
-        child: Text(
-          fromOriginal
-            ? _word.translateList.elementAt(0)
-            : _word.word,
-          style: TextStyle(height: 5, fontSize: 20),
-        ),
-      ),
-      header: InkWell(
-        onTap: () async {
-          await vocabularyBloc?.checkVariant.add(_word);
-        },
-        child: Image.asset(_word.imagePath),
-      ),
-      child: Container(),
+    return StreamBuilder<bool>(
+      stream: vocabularyBloc?.variantResultStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasData && _tapped) {
+          _variantResult = snapshot.data;
+        }
+        _tapped = false;
+        return Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 5.0,
+              color: _variantResult == null
+                ? Colors.white
+                : _variantResult
+                  ? Colors.green
+                  : Colors.red
+            ),
+          ),
+          child: InkWell(
+            onTap: () async {
+              _tapped = true;
+              await vocabularyBloc?.checkVariant.add(_word);
+            },
+            child: GridTile(
+              footer: Center(
+                child: Text(
+                  fromOriginal
+                    ? _word.translateList.elementAt(0)
+                    : _word.word,
+                  style: TextStyle(height: 5, fontSize: 20),
+                ),
+              ),
+              child: Container(),
+              header: Image.asset(_word.imagePath),
+            ),
+          ),
+        );
+      },
     );
   }
 }

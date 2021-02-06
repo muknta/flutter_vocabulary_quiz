@@ -23,14 +23,19 @@ class VocabularyBloc {
     vocBloc._newWordActionController
         .stream
         .listen(vocBloc._addWordToList);
-    vocBloc._setWordList.add(await vocBloc._getAllWords());
-    
+
+    await vocBloc._updateWordListControll();
     return vocBloc;
   }
 
   final VocabularyDataRepository _vocabularyRepo;
   int _currQuizWordNum = 0;
   int _errorCounter = 0;
+  Map<String, dynamic> _globalCounting = {
+    'errors': 0,
+    'failures': 0,
+    'successes': 0,
+  };
   List<Word> _quizWords = [];
   List<Word> _quizVariants = [];
   List<Word> _allWords = [];
@@ -53,9 +58,15 @@ class VocabularyBloc {
   final BehaviorSubject<List<Word>> _variantsController = BehaviorSubject();
   Stream get variantsStream => _variantsController.stream;
   Sink get _setVariants => _variantsController.sink;
+
+  /// Single variant in quiz
+  final BehaviorSubject<bool> _variantResultController = BehaviorSubject();
+  Stream get variantResultStream => _variantResultController.stream;
+  Sink get _setVariantResult => _variantResultController.sink;
   /// Add Word with translate in home
   StreamController<Word> _variantActionController = StreamController();
   StreamSink get checkVariant => _variantActionController.sink;
+
 
   /// Word in quiz
   final BehaviorSubject<Word> _quizWordController = BehaviorSubject();
@@ -68,7 +79,7 @@ class VocabularyBloc {
   Sink get _setFromOriginal => _fromOriginalController.sink;
 
 
-  Future<List<Word>> _updateWordListControll() async {
+  Future<void> _updateWordListControll() async {
     _setWordList.add(await _getAllWords());
   }
 
@@ -92,7 +103,7 @@ class VocabularyBloc {
 
   Future<bool> onStartQuiz() async {
     _setFromOriginal.add(true);
-    _currQuizWordNum++;
+    _currQuizWordNum = 1;
     bool _result;
     _result = await _generateQuizWords();
     return _result
@@ -106,6 +117,11 @@ class VocabularyBloc {
       isPassed: isPassed,
       doesSelectedOnce: true,
     );
+    await _updateWordListControll();
+    _globalCounting['errors'] += _errorCounter;
+    isPassed
+      ? _globalCounting['successes']++
+      : _globalCounting['failures']++;
     _errorCounter = 0;
     if (++_currQuizWordNum > Config.quizWordsNum) {
       _setQuizWord.add(null);
@@ -114,11 +130,12 @@ class VocabularyBloc {
       locator<NavigationService>().navigateTo(
         Routes.result,
         arguments: {
-          'percentage': calculateResult(),
+          'global_result': globalResult,
+          'percentage': percentResult,
         },
       );
-      
-      _currQuizWordNum = 0;
+
+      _currQuizWordNum = 1;
       return true;
     }
     _setQuizWord.add(currQuizWord);
@@ -142,7 +159,6 @@ class VocabularyBloc {
     if (_quizVariants?.isEmpty ?? true) {
       return false;
     }
-    print('_quizVariants - $_quizVariants');
     _setVariants.add(_quizVariants);
     return true;
   }
@@ -163,12 +179,21 @@ class VocabularyBloc {
           });
       }
     }
+    _setVariantResult.add(_result);
+    Future.delayed(const Duration(
+        milliseconds: Config.millisecondsDelayed), () {
+          _setVariantResult.add(null);
+        });
     return _result;
+  }
+
+  Future<bool> checkIfWordUnique(String word) async {
+    return await _vocabularyRepo.checkIfWordUnique(word);
   }
 
   Future<bool> deleteLastWord() async {
     // print('$_allWords');
-    bool _result = true;
+    bool _result = false;
     if (_allWords?.isNotEmpty ?? false) {
       _result = await _vocabularyRepo.deleteWord(_allWords?.last);
 
@@ -185,9 +210,10 @@ class VocabularyBloc {
   }
 
 
+  Map<String, dynamic> get globalResult => _globalCounting;
+  double get percentResult =>
+      (_globalCounting['successes'] / Config.quizWordsNum)*100;
 
-
-  double calculateResult() { return 42; }
 
   Future<void> _deleteAllRecords() async {
     await _vocabularyRepo.deleteAllRecords();
@@ -200,6 +226,7 @@ class VocabularyBloc {
     _wordListController.close();
     _variantActionController.close();
     _variantsController.close();
+    _variantResultController.close();
     _quizWordController.close();
   }
 }

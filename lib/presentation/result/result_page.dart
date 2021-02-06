@@ -12,9 +12,11 @@ import 'package:vocabulary_quiz/presentation/home/home_page.dart';
 class ResultPage extends StatelessWidget {
   const ResultPage({
     Key key,
+    @required this.globalResult,
     @required this.percentage,
   }) : super(key: key);
 
+  final Map<String, dynamic> globalResult;
   final double percentage;
 
   @override
@@ -25,29 +27,34 @@ class ResultPage extends StatelessWidget {
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: _contentColumn(),
+        child: _contentColumn(context),
       ),
     );
   }
 
-  Widget _contentColumn() {
+  Widget _contentColumn(context) {
     return Column(
       children: <Widget>[
         ResultMessage(
+          globalResult: globalResult,
           percentage: percentage,
         ),
-        _navigateToHomeButton(),
+        _navigateToHomeButton(context),
       ],
     );
   }
 
-  Widget _navigateToHomeButton() {
-    return ElevatedButton(
-      onPressed: () {
-        locator<NavigationService>().navigateTo(
-            Routes.home);
-      },
-      child: Text("Move to home"),
+  Widget _navigateToHomeButton(context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 100),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          // locator<NavigationService>().navigateTo(
+          //     Routes.home);
+        },
+        child: Text("Move to home"),
+      ),
     );
   }
 }

@@ -6,9 +6,11 @@ import 'package:vocabulary_quiz/domain/model/word.dart';
 
 class ResultMessage extends StatelessWidget {
   ResultMessage({
+    @required this.globalResult,
     @required this.percentage,
   });
 
+  final Map<String, dynamic> globalResult;
   final double percentage;
   bool isPositive;
 
@@ -20,9 +22,24 @@ class ResultMessage extends StatelessWidget {
     isPositive = _getMood();
     return Expanded(
       child: Center(
-        child: isPositive
-          ? PositiveMessage(percentage)
-          : NegativeMessage(percentage),
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              child: Center(
+                child: Text("\nGlobal result:\n"
+                  + "failures - ${globalResult['failures']}\n"
+                  + "errors - ${globalResult['errors']}\n"
+                  + "successes - ${globalResult['successes']}\n",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+            ),
+            isPositive
+              ? PositiveMessage(percentage)
+              : NegativeMessage(percentage),
+          ],
+        ),
       ),
     );
   }
@@ -44,7 +61,7 @@ class PositiveMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       "${percentage}%\nCongrats!\nGood result.",
-      // style: TextStyle(),
+      style: TextStyle(fontSize: 20),
     );
   }
 }
@@ -58,7 +75,7 @@ class NegativeMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       "${percentage}%\nYou can better :)",
-      // style: TextStyle(),
+      style: TextStyle(fontSize: 20),
     );
   }
 }

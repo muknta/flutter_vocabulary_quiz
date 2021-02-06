@@ -50,9 +50,6 @@ class QuizPage extends StatelessWidget {
         title: Text(
           "Quiz Word (${vocabularyBloc?.currQuizWordNum}/${Config.quizWordsNum})",
         ),
-        actions: <Widget>[
-          
-        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -107,7 +104,6 @@ class QuizPage extends StatelessWidget {
   }
 
   Widget _generateVariantList() {
-    print('Variants: $_variants');
     return Expanded(
       child: GridView.builder(
         itemCount: _variants?.length,

@@ -70,14 +70,21 @@ class HomePage extends StatelessWidget {
             ],
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               final RegExp _regExp = RegExp(r'[a-zA-Zа-яА-Я]');
               if (_wordController.text.contains(_regExp)
                   && _translateController.text.contains(_regExp)) {
-                vocabularyBloc?.addWordWithTranslate.add({
-                  'word': _wordController.text,
-                  'translate': _translateController.text,
-                });
+                bool _result = await vocabularyBloc?.checkIfWordUnique(
+                                      _wordController.text);
+                if (_result) {
+                  await vocabularyBloc?.addWordWithTranslate.add({
+                    'word': _wordController.text,
+                    'translate': _translateController.text,
+                  });
+                  ToastWidget.show("Successfully added new translate", context, false);
+                } else {
+                  ToastWidget.show("Word already exist", context, false);
+                }
               } else {
                 ToastWidget.show("Fill the fields correctly", context, false);
               }
@@ -90,7 +97,6 @@ class HomePage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () async {
                     bool _result = await vocabularyBloc?.deleteLastWord();
-                    print(_result);
                     _result
                       ? ToastWidget.show("Successfully deleted last word", context, _result)
                       : ToastWidget.show("Error on deleting last word", context, _result);
@@ -99,13 +105,12 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               VerticalDivider(
-                width: 3,
+                width: 4,
               ),
               Expanded(
                 child: ElevatedButton(
                   onPressed: () async {
                     bool _result = await vocabularyBloc?.uploadTestSet();
-                    print(_result);
                     _result
                       ? ToastWidget.show("Successfully uploaded test data", context, _result)
                       : ToastWidget.show("Error on uploading test data", context, _result);
@@ -143,6 +148,7 @@ class HomePage extends StatelessWidget {
           border: UnderlineInputBorder(
             borderSide: BorderSide(
               color: Colors.red,
+              width: 10,
             ),
           ),
         ),
