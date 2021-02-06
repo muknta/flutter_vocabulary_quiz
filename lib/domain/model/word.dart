@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 
 class Word {
   Word({
+    this.primaryKey,
     @required this.word,
     @required this.translateList,
     this.imagePath,
@@ -10,7 +11,7 @@ class Word {
     this.doesSelectedOnce = false,
   });
 
-  int primaryKey;
+  final int primaryKey;
   final String word;
   final List<dynamic> translateList;
   final String imagePath;
@@ -18,6 +19,7 @@ class Word {
   final bool doesSelectedOnce;
 
   Word copyWith({
+    int primaryKey,
     String word,
     List<dynamic> translateList,
     String imagePath,
@@ -25,6 +27,7 @@ class Word {
     bool doesSelectedOnce,
   }) {
     return Word(
+      primaryKey: primaryKey ?? this.primaryKey,
       word: word ?? this.word,
       translateList: translateList ?? this.translateList,
       imagePath: imagePath ?? this.imagePath,

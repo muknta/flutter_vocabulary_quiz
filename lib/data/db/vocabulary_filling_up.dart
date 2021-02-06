@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 
 import 'package:vocabulary_quiz/internal/locator.dart';
+import 'package:vocabulary_quiz/data/config.dart';
 import 'package:vocabulary_quiz/data/db/word_dao.dart';
 import 'package:vocabulary_quiz/domain/model/word.dart';
 import 'package:vocabulary_quiz/domain/model/vocabulary.dart';
@@ -15,7 +16,7 @@ class VocabularyFillingUp {
   }
 
   static Future<bool> fillingUp() async {
-    int primaryKey;
+    bool _result;
     // final bool _isEmpty = await VocabularyFillingUp.checkForEmpty();
     // if (!_isEmpty) {
     //   print('Vocabulary is already filled');
@@ -26,9 +27,9 @@ class VocabularyFillingUp {
     List<Word> wordList = VocabularyFillingUp.testSet.wordList;
 
     for (Word _word in wordList) {
-      primaryKey = await wordDao.insertWord(_word);
+      _result = await wordDao.insertWord(_word);
     }
-    return primaryKey != null && primaryKey != 0;
+    return _result;
   }
 
 
@@ -36,71 +37,71 @@ class VocabularyFillingUp {
     wordList: [
       Word(
         word: 'cat',
-        translateList: ['кошка', 'кот'],
-        imagePath: 'assets/cat_and_flower.png',
+        translateList: ['кошка', 'котовасия'],
+        imagePath: Config.defaultImageLocalPath,
         isPassed: false,
         doesSelectedOnce: false,
       ),
       Word(
-        word: 'cat',
-        translateList: ['кошка', 'кот'],
-        imagePath: 'assets/cat_and_flower.png',
+        word: 'dog',
+        translateList: ['собакен', 'пёс'],
+        imagePath: Config.defaultImageLocalPath,
         isPassed: false,
         doesSelectedOnce: false,
       ),
       Word(
-        word: 'cat',
-        translateList: ['кошка', 'кот'],
-        imagePath: 'assets/cat_and_flower.png',
+        word: 'frog',
+        translateList: ['квакуха', 'лягушатник'],
+        imagePath: Config.defaultImageLocalPath,
         isPassed: false,
         doesSelectedOnce: false,
       ),
       Word(
-        word: 'cat',
-        translateList: ['кошка', 'кот'],
-        imagePath: 'assets/cat_and_flower.png',
+        word: 'stoun',
+        translateList: ['хэндж', 'камень'],
+        imagePath: Config.defaultImageLocalPath,
         isPassed: false,
         doesSelectedOnce: false,
       ),
       Word(
-        word: 'cat',
-        translateList: ['кошка', 'кот'],
-        imagePath: 'assets/cat_and_flower.png',
+        word: 'house',
+        translateList: ['дом', 'домушник'],
+        imagePath: Config.defaultImageLocalPath,
         isPassed: false,
         doesSelectedOnce: false,
       ),
       Word(
-        word: 'cat',
-        translateList: ['кошка', 'кот'],
-        imagePath: 'assets/cat_and_flower.png',
+        word: 'flower',
+        translateList: ['цветок', 'цветочичечек'],
+        imagePath: Config.defaultImageLocalPath,
         isPassed: false,
         doesSelectedOnce: false,
       ),
       Word(
-        word: 'cat',
-        translateList: ['кошка', 'кот'],
-        imagePath: 'assets/cat_and_flower.png',
+        word: 'green',
+        translateList: ['зелень', 'зелёная'],
+        imagePath: Config.defaultImageLocalPath,
         isPassed: false,
         doesSelectedOnce: false,
       ),
       Word(
-        word: 'cat',
-        translateList: ['кошка', 'кот'],
-        imagePath: 'assets/cat_and_flower.png',
+        word: 'tower',
+        translateList: ['мост', 'мостишка'],
+        imagePath: Config.defaultImageLocalPath,
         isPassed: false,
         doesSelectedOnce: false,
       ),
       Word(
-        word: 'cat',
-        translateList: ['кошка', 'кот'],
-        imagePath: 'assets/cat_and_flower.png',
+        word: 'cycle',
+        translateList: ['круг'],
+        imagePath: Config.defaultImageLocalPath,
         isPassed: false,
         doesSelectedOnce: false,
       ),
       Word(
-        word: 'cat',
-        translateList: ['кошка', 'кот'],
-        imagePath: 'assets/cat_and_flower.png',
+        word: 'triangle',
+        translateList: ['треугольник'],
+        imagePath: Config.defaultImageLocalPath,
         isPassed: false,
         doesSelectedOnce: false,
       ),

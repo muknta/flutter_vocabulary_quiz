@@ -21,7 +21,7 @@ class VocabularyBloc {
         .stream
         .listen(vocBloc._addWordToList);
     vocBloc._setWordList.add(await vocBloc._getAllWords());
-    _vocabularyRepo.generateQuizWords();
+    
     return vocBloc;
   }
 
@@ -73,15 +73,15 @@ class VocabularyBloc {
     return _allWords;
   }
 
-  Future<int> _addWordToList(
+  Future<bool> _addWordToList(
     Map<String, String> wordWithTranslate,
   ) async {
-    final int _result = await _vocabularyRepo.insertWord(
+    final bool _result = await _vocabularyRepo.insertWord(
         word: wordWithTranslate['word'],
         translateList: [wordWithTranslate['translate']],
       );
-    if (_result != 0 && _result != null) {
-      _updateWordListControll();
+    if (_result) {
+      await _updateWordListControll();
     }
     return _result;
   }
@@ -123,8 +123,7 @@ class VocabularyBloc {
     print('$_allWords');
     bool _result = true;
     if (_allWords?.isNotEmpty ?? false) {
-      print('${_allWords.first.primaryKey} ${_allWords.elementAt(3).primaryKey} ${_allWords.last.primaryKey}');
-      _result = await _vocabularyRepo.deleteWord(_allWords.first);
+      _result = await _vocabularyRepo.deleteWord(_allWords?.last);
 
       await _updateWordListControll();
     }
@@ -150,6 +149,7 @@ class VocabularyBloc {
   }
 
   void dispose() {
-
+    _newWordActionController.close();
+    _variantActionController.close();
   }
 }

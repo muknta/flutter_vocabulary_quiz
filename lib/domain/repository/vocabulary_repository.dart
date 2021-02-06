@@ -9,7 +9,7 @@ abstract class VocabularyRepository {
 
   Future<bool> uploadTestSet();
 
-  Future<int> insertWord({
+  Future<bool> insertWord({
     @required String word,
     @required List<String> translateList,
     String imagePath,

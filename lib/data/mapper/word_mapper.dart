@@ -14,15 +14,13 @@ class WordMapper {
     };
   }
 
-  static Word fromJson(Map<String, dynamic> json) {
-    Word _word = Word(
-      word: json['word'],
-      translateList: json['translate_list'],
-      imagePath: json['image_path'],
-      isPassed: json['is_passed'],
-      doesSelectedOnce: json['does_selected_once'],
-    );
-    _word.primaryKey = json['primary_key'];
-    return _word;
-  }
+  static Word fromJson(Map<String, dynamic> json) =>
+      Word(
+        primaryKey: json['primary_key'],
+        word: json['word'],
+        translateList: json['translate_list'],
+        imagePath: json['image_path'],
+        isPassed: json['is_passed'],
+        doesSelectedOnce: json['does_selected_once'],
+      );
 }

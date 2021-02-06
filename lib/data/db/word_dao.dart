@@ -19,7 +19,7 @@ class WordDao {
 
 
 
-  Future<int> insertWord(Word word) async {
+  Future<bool> insertWord(Word word) async {
     try {
       // await _wordFolder.add(_db, WordMapper.toJson(word));
       // print('Word inserted');
@@ -31,15 +31,15 @@ class WordDao {
         // Add the object, get the auto incremented id
         final int key = await _wordFolder.add(txn, WordMapper.toJson(word));
         print('key - $key');
-        word.primaryKey = key;
+        word.copyWith(primaryKey: key);
         // Set the Id in our object
-        await _wordFolder.update(txn, {'primary_key': key});
+        await _wordFolder.record(key).update(txn, {'primary_key': key});
       });
-      return word.primaryKey;
+      return true;
     } on InsertingException {
       print('InsertingException');
     }
-    return 0;
+    return false;
   }
 
   Future<bool> updateWord({

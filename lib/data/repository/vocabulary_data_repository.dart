@@ -106,7 +106,8 @@ class VocabularyDataRepository extends VocabularyRepository {
   }
 
   @override
-  Future<int> insertWord({
+  Future<bool> insertWord({
+    int primaryKey,
     @required String word,
     @required List<dynamic> translateList,
     String imagePath = Config.defaultImageLocalPath,
@@ -115,6 +116,7 @@ class VocabularyDataRepository extends VocabularyRepository {
   }) async {
     return await wordDao.insertWord(
       Word(
+        primaryKey: primaryKey,
         word: word,
         translateList: translateList,
         imagePath: imagePath,
