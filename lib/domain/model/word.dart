@@ -11,7 +11,7 @@ class Word {
     this.doesSelectedOnce = false,
   });
 
-  final int primaryKey;
+  int primaryKey;
   final String word;
   final List<dynamic> translateList;
   final String imagePath;

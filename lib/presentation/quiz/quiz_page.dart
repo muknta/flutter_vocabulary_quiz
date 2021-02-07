@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:vocabulary_quiz/internal/navigation/navigation.dart';
 import 'package:vocabulary_quiz/internal/locator.dart';
 import 'package:vocabulary_quiz/data/config.dart';
-import 'package:vocabulary_quiz/domain/model/vocabulary.dart';
 import 'package:vocabulary_quiz/domain/model/word.dart';
 import 'package:vocabulary_quiz/domain/bloc/vocabulary_bloc.dart';
 import 'package:vocabulary_quiz/presentation/widgets/center_text_widget.dart';
@@ -14,17 +13,11 @@ import 'package:vocabulary_quiz/presentation/result/result_page.dart';
 
 
 class QuizPage extends StatelessWidget {
-  QuizPage({
-    Key key,
-    @required this.vocabulary
-  }) : super(key: key);
 
-  Vocabulary vocabulary;
   VocabularyBloc vocabularyBloc;
   Word _currWord;
   List<Word> _variants = [];
   bool _fromOriginal = true;
-  // int _currWordNum = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -132,14 +125,12 @@ class QuizPage extends StatelessWidget {
   // }
 
   // Widget _getResultButton() {
-  //   final double _percentage = vocabularyBloc?.calculateResult();
-
   //   return ElevatedButton(
   //     onPressed: () {
   //       locator<NavigationService>().navigateTo(
   //         Routes.result,
   //         arguments: {
-  //           'percentage': _percentage,
+  //           'percentage': vocabularyBloc?.globalResult.percentage,
   //         },
   //       );
   //     },

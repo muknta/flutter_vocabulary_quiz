@@ -6,6 +6,7 @@ import 'package:vocabulary_quiz/internal/navigation/navigation.dart';
 import 'package:vocabulary_quiz/internal/locator.dart';
 import 'package:vocabulary_quiz/data/config.dart';
 import 'package:vocabulary_quiz/data/repository/vocabulary_data_repository.dart';
+import 'package:vocabulary_quiz/domain/model/global_result.dart';
 import 'package:vocabulary_quiz/domain/model/word.dart';
 
 
@@ -31,14 +32,12 @@ class VocabularyBloc {
   final VocabularyDataRepository _vocabularyRepo;
   int _currQuizWordNum = 0;
   int _errorCounter = 0;
-  Map<String, dynamic> _globalCounting = {
-    'errors': 0,
-    'failures': 0,
-    'successes': 0,
-  };
+  GlobalResult _globalResult = GlobalResult();
   List<Word> _quizWords = [];
   List<Word> _quizVariants = [];
   List<Word> _allWords = [];
+
+  GlobalResult get globalResult => _globalResult;
 
   /// Page number in quiz
   int get currQuizWordNum => _currQuizWordNum;
@@ -63,7 +62,7 @@ class VocabularyBloc {
   final BehaviorSubject<bool> _variantResultController = BehaviorSubject();
   Stream get variantResultStream => _variantResultController.stream;
   Sink get _setVariantResult => _variantResultController.sink;
-  /// Add Word with translate in home
+  /// 
   StreamController<Word> _variantActionController = StreamController();
   StreamSink get checkVariant => _variantActionController.sink;
 
@@ -102,7 +101,7 @@ class VocabularyBloc {
   }
 
   Future<bool> onStartQuiz() async {
-    _setFromOriginal.add(true);
+    _setFromOriginal.add(Config.defaultTranslateFromOriginal);
     _currQuizWordNum = 1;
     bool _result;
     _result = await _generateQuizWords();
@@ -118,10 +117,11 @@ class VocabularyBloc {
       doesSelectedOnce: true,
     );
     await _updateWordListControll();
-    _globalCounting['errors'] += _errorCounter;
+    _globalResult.updateErrors(_errorCounter);
     isPassed
-      ? _globalCounting['successes']++
-      : _globalCounting['failures']++;
+      ? _globalResult.incrementSuccesses()
+      : _globalResult.incrementFailures();
+
     _errorCounter = 0;
     if (++_currQuizWordNum > Config.quizWordsNum) {
       _setQuizWord.add(null);
@@ -130,10 +130,10 @@ class VocabularyBloc {
       locator<NavigationService>().navigateTo(
         Routes.result,
         arguments: {
-          'global_result': globalResult,
-          'percentage': percentResult,
+          'global_result': globalResult.copyWith(),
         },
       );
+      _globalResult.clearAll();
 
       _currQuizWordNum = 1;
       return true;
@@ -164,7 +164,9 @@ class VocabularyBloc {
   }
 
   Future<bool> _checkVariant(Word _variant) async {
-    bool _result = _variant.primaryKey == currQuizWord.primaryKey;
+    print('_variant?.primaryKey ${_variant?.primaryKey}\ncurrQuizWord.primaryKey ${currQuizWord.primaryKey}');
+    print('_variant?.primaryKey ${_variant?.primaryKey == currQuizWord.primaryKey}');
+    bool _result = (_variant?.primaryKey == currQuizWord.primaryKey);
 
     if (_result) {
       Future.delayed(const Duration(
@@ -208,12 +210,6 @@ class VocabularyBloc {
 
     return _result;
   }
-
-
-  Map<String, dynamic> get globalResult => _globalCounting;
-  double get percentResult =>
-      (_globalCounting['successes'] / Config.quizWordsNum)*100;
-
 
   Future<void> _deleteAllRecords() async {
     await _vocabularyRepo.deleteAllRecords();

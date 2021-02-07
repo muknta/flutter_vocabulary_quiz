@@ -29,6 +29,8 @@ class VariantGridTile extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData && _tapped) {
           _variantResult = snapshot.data;
+        } else {
+          _variantResult = null;
         }
         _tapped = false;
         return Container(

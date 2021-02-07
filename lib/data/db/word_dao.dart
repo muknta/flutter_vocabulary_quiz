@@ -25,7 +25,7 @@ class WordDao {
         // Add the object, get the auto incremented id
         final int key = await _wordFolder.add(txn, WordMapper.toJson(word));
         print('New word key - $key');
-        word.copyWith(primaryKey: key);
+        word.primaryKey = key;
         // Set the Id in our object
         await _wordFolder.record(key).update(txn, {'primary_key': key});
       });

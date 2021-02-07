@@ -21,9 +21,7 @@ class Routes {
         final dynamic args = settings.arguments;
         return Routes.getPageRoute(
           routeName: settings.name,
-          viewToShow: QuizPage(
-            vocabulary: args["vocabulary"],
-          ),
+          viewToShow: QuizPage(),
         );
       }
       case Routes.result: {
@@ -32,7 +30,6 @@ class Routes {
           routeName: settings.name,
           viewToShow: ResultPage(
             globalResult: args["global_result"],
-            percentage: args["percentage"],
           ),
         );
       }
