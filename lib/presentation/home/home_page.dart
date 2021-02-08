@@ -32,7 +32,6 @@ class HomePage extends StatelessWidget {
       stream: vocabularyBloc?.fromOriginalStream,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          print('snapshot _fromOriginal $snapshot');
           _fromOriginal = snapshot.data;
         }
         return Scaffold(
@@ -63,7 +62,6 @@ class HomePage extends StatelessWidget {
         color: Colors.white,
       ),
       onChanged: (String chosenTrans) {
-        print('changed - $chosenTrans ${chosenTrans == _fromOriginalList[0]}');
         chosenTrans == _fromOriginalList[0]
           ? vocabularyBloc?.setFromOriginal.add(true)
           : vocabularyBloc?.setFromOriginal.add(false);
@@ -126,7 +124,7 @@ class HomePage extends StatelessWidget {
                     'word': _wordController.text,
                     'translate': _translateController.text,
                   });
-                  ToastWidget.show("Successfully added new translate", context, false);
+                  ToastWidget.show("Successfully added new translate", context, true);
                 } else {
                   ToastWidget.show("Word already exist", context, false);
                 }
