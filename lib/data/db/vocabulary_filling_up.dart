@@ -2,7 +2,7 @@ import 'package:meta/meta.dart';
 
 import 'package:vocabulary_quiz/internal/locator.dart';
 import 'package:vocabulary_quiz/data/config.dart';
-import 'package:vocabulary_quiz/data/db/word_dao.dart';
+import 'package:vocabulary_quiz/data/db/dao/word_dao.dart';
 import 'package:vocabulary_quiz/domain/model/word.dart';
 import 'package:vocabulary_quiz/domain/model/vocabulary.dart';
 

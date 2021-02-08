@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:vocabulary_quiz/internal/navigation/navigation.dart';
 import 'package:vocabulary_quiz/internal/locator.dart';
+import 'package:vocabulary_quiz/data/config.dart';
 import 'package:vocabulary_quiz/domain/model/word.dart';
 import 'package:vocabulary_quiz/domain/model/vocabulary.dart';
 import 'package:vocabulary_quiz/domain/bloc/vocabulary_bloc.dart';
@@ -18,6 +19,8 @@ class HomePage extends StatelessWidget {
 
   VocabularyBloc vocabularyBloc;
   Vocabulary _vocabulary;
+  bool _fromOriginal = Config.defaultFromOriginalValue;
+  final List<String> _fromOriginalList = ['from eng', 'from rus'];
 
   final TextEditingController _wordController = TextEditingController();
   final TextEditingController _translateController = TextEditingController();
@@ -25,14 +28,56 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     vocabularyBloc = Provider.of<VocabularyBloc>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Vocabulary Quiz"),
+    return StreamBuilder<bool>(
+      stream: vocabularyBloc?.fromOriginalStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          print('snapshot _fromOriginal $snapshot');
+          _fromOriginal = snapshot.data;
+        }
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("Vocabulary Quiz"),
+            actions: <Widget>[
+            _fromOriginalChooser(),
+            ],
+          ),
+          body: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: _contentColumn(context),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _fromOriginalChooser() {
+    return DropdownButton<String>(
+      value: _fromOriginal ? _fromOriginalList[0] : _fromOriginalList[1],
+      icon: Icon(Icons.arrow_downward),
+      iconSize: 24,
+      elevation: 16,
+      style: TextStyle(color: Colors.black),
+      underline: Container(
+        height: 2,
+        color: Colors.white,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: _contentColumn(context),
-      ),
+      onChanged: (String chosenTrans) {
+        print('changed - $chosenTrans ${chosenTrans == _fromOriginalList[0]}');
+        chosenTrans == _fromOriginalList[0]
+          ? vocabularyBloc?.setFromOriginal.add(true)
+          : vocabularyBloc?.setFromOriginal.add(false);
+      },
+      items: _fromOriginalList
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(
+            value,
+            style: TextStyle(fontSize: 20),
+          ),
+        );
+      }).toList(),
     );
   }
 

@@ -1,3 +1,7 @@
+import 'dart:ui';
+import 'dart:math';
+
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sembast/sembast.dart';
@@ -17,6 +21,13 @@ class Application extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!isTablet()) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown
+      ]);
+    }
+
     return MultiProvider(
       providers: [
         FutureProvider<VocabularyBloc>(
@@ -50,5 +61,13 @@ class Application extends StatelessWidget {
       initialRoute: Routes.home,
       home: HomePage(),
     );
+  }
+
+  bool isTablet() {
+    Size size = window.physicalSize;
+    double ratio = window.devicePixelRatio;
+    double width = min(size.width / ratio, size.height / ratio);
+    print(width);
+    return width > 600;
   }
 }

@@ -38,5 +38,9 @@ abstract class VocabularyRepository {
     @required bool doesSelectedOnce,
   });
 
+  Future<bool> setFromOriginal({
+    @required bool fromOriginal,
+  });
+
   Future<void> deleteAllRecords();
 }

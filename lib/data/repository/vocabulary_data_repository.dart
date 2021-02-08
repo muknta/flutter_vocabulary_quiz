@@ -4,10 +4,12 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 
-import 'package:vocabulary_quiz/data/db/word_dao.dart';
+import 'package:vocabulary_quiz/data/db/dao/word_dao.dart';
+import 'package:vocabulary_quiz/data/db/dao/settings_dao.dart';
 import 'package:vocabulary_quiz/data/db/vocabulary_filling_up.dart';
 import 'package:vocabulary_quiz/data/config.dart';
 import 'package:vocabulary_quiz/domain/model/word.dart';
+import 'package:vocabulary_quiz/domain/model/setting.dart';
 // import 'package:vocabulary_quiz/domain/model/vocabulary.dart';
 import 'package:vocabulary_quiz/domain/repository/vocabulary_repository.dart';
 
@@ -15,9 +17,12 @@ import 'package:vocabulary_quiz/domain/repository/vocabulary_repository.dart';
 class VocabularyDataRepository extends VocabularyRepository {
   VocabularyDataRepository({
     @required this.wordDao,
-  }) : assert(wordDao != null);
+    @required this.settingsDao,
+  })  : assert(wordDao != null),
+        assert(settingsDao != null);
 
   final WordDao wordDao;
+  final SettingsDao settingsDao;
 
   @override
   Future<List<Word>> getAllWords() async {
@@ -218,6 +223,20 @@ class VocabularyDataRepository extends VocabularyRepository {
     return await wordDao.updateWord(
       newWord: newWord,
       oldWord: word,
+    );
+  }
+
+  @override
+  Future<bool> setFromOriginal({
+    @required bool fromOriginal,
+  }) async {
+    print('rep fromOriginal $fromOriginal');
+    final _setting = Setting(
+      title: Config.fromOriginalTitle,
+      value: fromOriginal,
+    );
+    return await settingsDao.updateSetting(
+      setting: _setting,
     );
   }
 

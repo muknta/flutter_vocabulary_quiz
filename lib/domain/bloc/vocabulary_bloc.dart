@@ -24,7 +24,12 @@ class VocabularyBloc {
     vocBloc._newWordActionController
         .stream
         .listen(vocBloc._addWordToList);
+    vocBloc._fromOriginalActionController
+        .stream
+        .listen(vocBloc._updateFromOriginal);
 
+    /// TODO: move const to database
+    await vocBloc._setFromOriginal.add(Config.defaultFromOriginalValue);
     await vocBloc._updateWordListControll();
     return vocBloc;
   }
@@ -32,6 +37,7 @@ class VocabularyBloc {
   final VocabularyDataRepository _vocabularyRepo;
   int _currQuizWordNum = 0;
   int _errorCounter = 0;
+  bool _fromOriginal = true;
   GlobalResult _globalResult = GlobalResult();
   List<Word> _quizWords = [];
   List<Word> _quizVariants = [];
@@ -76,6 +82,8 @@ class VocabularyBloc {
   final BehaviorSubject<bool> _fromOriginalController = BehaviorSubject();
   Stream get fromOriginalStream => _fromOriginalController.stream;
   Sink get _setFromOriginal => _fromOriginalController.sink;
+  StreamController<bool> _fromOriginalActionController = StreamController();
+  StreamSink get setFromOriginal => _variantActionController.sink;
 
 
   Future<void> _updateWordListControll() async {
@@ -100,8 +108,17 @@ class VocabularyBloc {
     return _result;
   }
 
+  Future<bool> _updateFromOriginal(
+    bool fromOriginal,
+  ) async {
+    print('bloc fromOriginal $fromOriginal');
+    final bool _result = await _vocabularyRepo.setFromOriginal(
+        fromOriginal: fromOriginal,
+      );
+    return _result;
+  }
+
   Future<bool> onStartQuiz() async {
-    _setFromOriginal.add(Config.defaultTranslateFromOriginal);
     _currQuizWordNum = 1;
     bool _result;
     _result = await _generateQuizWords();
@@ -164,8 +181,6 @@ class VocabularyBloc {
   }
 
   Future<bool> _checkVariant(Word _variant) async {
-    print('_variant?.primaryKey ${_variant?.primaryKey}\ncurrQuizWord.primaryKey ${currQuizWord.primaryKey}');
-    print('_variant?.primaryKey ${_variant?.primaryKey == currQuizWord.primaryKey}');
     bool _result = (_variant?.primaryKey == currQuizWord.primaryKey);
 
     if (_result) {

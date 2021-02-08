@@ -4,15 +4,15 @@ import 'package:meta/meta.dart';
 import 'package:vocabulary_quiz/internal/locator.dart';
 import 'package:vocabulary_quiz/data/config.dart';
 import 'package:vocabulary_quiz/data/db/sembast_db.dart';
+import 'package:vocabulary_quiz/data/db/exceptions.dart';
 import 'package:vocabulary_quiz/data/mapper/word_mapper.dart';
 // import 'package:vocabulary_quiz/data/mapper/vocabulary_mapper.dart';
 import 'package:vocabulary_quiz/domain/model/vocabulary.dart';
 import 'package:vocabulary_quiz/domain/model/word.dart';
-import 'exceptions.dart';
 
 
 class WordDao {
-  final _wordFolder = intMapStoreFactory.store(Config.sembastFolderName);
+  final _wordFolder = intMapStoreFactory.store(Config.wordFolderName);
   // final _wordFolder = StoreRef<String, dynamic>.main();
 
   Database get _db => locator<Database>();

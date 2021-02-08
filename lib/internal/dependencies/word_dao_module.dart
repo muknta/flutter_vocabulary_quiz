@@ -1,4 +1,4 @@
-import 'package:vocabulary_quiz/data/db/word_dao.dart';
+import 'package:vocabulary_quiz/data/db/dao/word_dao.dart';
 
 
 class WordDaoModule {
