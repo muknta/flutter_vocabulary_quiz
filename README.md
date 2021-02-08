@@ -1,16 +1,29 @@
-# vocabulary_quiz
+# Vocabulary Quiz
+This app for learning of a words.
 
-A new Flutter project.
+## Structure
+Project divided by four structure levels (data, domain (business-logic), internal, presentation).
 
-## Getting Started
+Presentation contains three screens:
+- home page - list of words with learning statuses (white-new, red-unpassed, green-passed); "from LANG" toggle; add/fetch/delete words;
+- quiz page - one quiz words with 4 variants of translation;
+- result page - screen with detailed info about last quiz passing (errors, valid/invalid answers);
 
-This project is a starting point for a Flutter application.
+## Usage cycle
+- **add** own new word with translation or **fetch** test dataset by one click or **delete** last added word;
+- choose the mode: "from RU" or "from ENG";
+- press "Begin quiz";
+- try to guess 5 different words with 3 random test variants *(this words will change their learning statuses on home page)*;
+- getting a result;
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Running
+```bash
+$ git clone https://github.com/heknt/flutter_vocabulary_quiz.git
+$ cd flutter-weather-app
+```
+Connect your phone to computer and enable USB debugging. Next:
+```bash
+flutter_vocabulary_quiz$ flutter doctor
+flutter_vocabulary_quiz$ flutter pub get
+flutter_vocabulary_quiz$ flutter run
+```
