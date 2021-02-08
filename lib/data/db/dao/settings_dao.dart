@@ -1,4 +1,5 @@
 import 'package:sembast/sembast.dart';
+import 'package:sembast/utils/value_utils.dart' as sembUtils;
 import 'package:meta/meta.dart';
 
 import 'package:vocabulary_quiz/internal/locator.dart';
@@ -17,8 +18,8 @@ class SettingsDao {
   Future<bool> insertSetting(Setting setting) async {
     try {
       final Map<String, dynamic> _map = await getAllSettings();
-      final Map<String, dynamic> _settings = _map['data'];
-      _settings[setting.title] = setting.value;
+      final Map<String, dynamic> _settings = sembUtils.cloneMap(_map['data']);
+      _settings?.putIfAbsent(setting.title, () => setting.value);
       await updateAllSettings(_settings);
 
       return true;
@@ -32,16 +33,17 @@ class SettingsDao {
     @required Setting setting,
   }) async {
     try {
-
-      print('settingTitle ${setting.title} ${setting.value}');
       final Map<String, dynamic> _map = await getAllSettings();
-      final Map<String, dynamic> _settings = _map['data'];
-      _settings.update(
-        setting.title,
-        (_) => setting.value);
-      await updateAllSettings(_settings);
+      final Map<String, dynamic> _settings = sembUtils.cloneMap(_map['data']);
+      _settings?.putIfAbsent(setting.title, () => setting.value);
+      if (_map['result']) {
+        _settings?.update(
+          setting.title,
+          (_) => setting.value);
+        await updateAllSettings(_settings);
 
-      return true;
+        return true;
+      }
     } on UpdatingException {
       print('UpdatingException');
     }
@@ -51,16 +53,21 @@ class SettingsDao {
   Future<bool> updateAllSettings(
     @required Map<String, dynamic> settings,
   ) async {
+    bool _result;
     try {
-      await _settingsStore.record(Config.settingsRecordName)
+      var _res = await _settingsStore.record(Config.settingsRecordName)
               .update(_db, settings);
-      print('Settings updated');
+      if (_res != null) _result = true;
+      if (_result) {
+        print('Settings updated');
+      } else {
+        throw UpdatingException;
+      }
 
-      return true;
     } on UpdatingException {
       print('UpdatingException');
     }
-    return false;
+    return _result;
   }
 
   Future<bool> deleteSetting(String settingTitle) async {
@@ -107,7 +114,12 @@ class SettingsDao {
     bool result = false;
     Map<String, dynamic>_settings;
     try {
+
       _settings = await _settingsStore.record(Config.settingsRecordName).get(_db);
+      if (_settings == null) {
+        _settings = await _settingsStore.record(Config.settingsRecordName)
+              .put(_db, Map<String, dynamic>());
+      }
 
       result = true;
     } on ReadingException {

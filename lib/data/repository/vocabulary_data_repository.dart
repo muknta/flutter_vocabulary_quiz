@@ -230,7 +230,6 @@ class VocabularyDataRepository extends VocabularyRepository {
   Future<bool> setFromOriginal({
     @required bool fromOriginal,
   }) async {
-    print('rep fromOriginal $fromOriginal');
     final _setting = Setting(
       title: Config.fromOriginalTitle,
       value: fromOriginal,

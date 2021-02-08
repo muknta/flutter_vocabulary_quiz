@@ -83,7 +83,7 @@ class VocabularyBloc {
   Stream get fromOriginalStream => _fromOriginalController.stream;
   Sink get _setFromOriginal => _fromOriginalController.sink;
   StreamController<bool> _fromOriginalActionController = StreamController();
-  StreamSink get setFromOriginal => _variantActionController.sink;
+  StreamSink get setFromOriginal => _fromOriginalActionController.sink;
 
 
   Future<void> _updateWordListControll() async {
@@ -111,10 +111,10 @@ class VocabularyBloc {
   Future<bool> _updateFromOriginal(
     bool fromOriginal,
   ) async {
-    print('bloc fromOriginal $fromOriginal');
     final bool _result = await _vocabularyRepo.setFromOriginal(
         fromOriginal: fromOriginal,
       );
+    if (_result) _setFromOriginal.add(fromOriginal);
     return _result;
   }
 

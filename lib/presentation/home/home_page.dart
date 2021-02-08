@@ -39,7 +39,7 @@ class HomePage extends StatelessWidget {
           appBar: AppBar(
             title: Text("Vocabulary Quiz"),
             actions: <Widget>[
-            _fromOriginalChooser(),
+              _fromOriginalChooser(),
             ],
           ),
           body: Padding(
