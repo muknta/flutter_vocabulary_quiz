@@ -6,7 +6,7 @@ Project divided by four structure levels (data, domain (business-logic), interna
 
 Presentation contains three screens:
 - home page - list of words with learning statuses (white-new, red-unpassed, green-passed); "from LANG" toggle; add/fetch/delete words;
-- quiz page - one quiz words with 4 variants of translation;
+- quiz page - one quiz word with 4 variants of translation;
 - result page - screen with detailed info about last quiz passing (errors, valid/invalid answers);
 
 ## Usage cycle
