@@ -19,7 +19,7 @@ Presentation contains three screens:
 ## Running
 ```bash
 $ git clone https://github.com/heknt/flutter_vocabulary_quiz.git
-$ cd flutter-weather-app
+$ cd flutter_vocabulary_quiz
 ```
 Connect your phone to computer and enable USB debugging. Next:
 ```bash
